@@ -8,9 +8,9 @@ fn main() {
         Ok(configuration) => configuration,
         Err(e) => panic!("{}", e),
     };
-    if read::check_valid(&cfg.location) {
-        println!("The file exists!");
-    } else {
-        println!("The file does not exist!");
-    }
+    let str_content = match read::get_contents(&cfg.location) {
+        Ok(str) => str,
+        Err(e) => panic!("e"),
+    };
+    println!("{}", str_content);
 }

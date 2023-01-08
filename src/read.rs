@@ -1,6 +1,6 @@
 use std::env::Args;
-//use std::fs;
-use std::path::Path;
+use std::fs;
+use std::io;
 
 const EXPECTED_LENGTH_OF_ARGS:u8 = 2;
 pub struct Config {
@@ -24,7 +24,6 @@ impl Config {
         return Err("There are too few arguments in the command line, please try again.");
     }
 }
-
-pub fn check_valid(path : &String) -> bool {
-    Path::new(path).exists()
+pub fn get_contents(path: &String) -> io::Result<String> {
+    fs::read_to_string(path)
 }
