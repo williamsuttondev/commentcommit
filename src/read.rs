@@ -31,8 +31,9 @@ pub fn split_by_comment(content: String) {
     let line = content.lines();
     for indv in line {
         let handle = indv.trim();
-        if handle.starts_with("#") {
-            println!("I am comment!: {}", indv);
+        if handle.starts_with("###") {
+            let linespl:Vec<&str> = handle.split("###").collect();
+            println!("I am comment!: {}", linespl[1].trim());
         } else {
             println!("I am not a comment {}", indv);
         }
