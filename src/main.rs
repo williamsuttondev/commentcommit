@@ -12,5 +12,5 @@ fn main() {
         Ok(str) => str,
         Err(e) => panic!("{}", e),
     };
-    println!("{}", str_content);
+    read::split_by_comment(str_content);
 }

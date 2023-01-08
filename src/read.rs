@@ -27,3 +27,14 @@ impl Config {
 pub fn get_contents(path: &String) -> io::Result<String> {
     fs::read_to_string(path)
 }
+pub fn split_by_comment(content: String) {
+    let line = content.lines();
+    for indv in line {
+        let handle = indv.trim();
+        if handle.starts_with("#") {
+            println!("I am comment!: {}", indv);
+        } else {
+            println!("I am not a comment {}", indv);
+        }
+    }
+}
