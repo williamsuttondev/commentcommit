@@ -10,7 +10,7 @@ fn main() {
     };
     let str_content = match read::get_contents(&cfg.location) {
         Ok(str) => str,
-        Err(e) => panic!("e"),
+        Err(e) => panic!("{}", e),
     };
     println!("{}", str_content);
 }
