@@ -69,19 +69,17 @@ fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> 
         }
         actionable_line.remove(0);
         let mut parts = actionable_line.splitn(2, ' ');
-        let cmd_type_arg = match parts.next() {
-            Some(t) => t,
-            None => "",
-        };
-        let query_content = match parts.next() {
-            Some(t) => t,
-            None => "",
-        };
         let ccentry: Command = Command {
-            command_type: commandtype(cmd_type_arg).unwrap_or_else(|_|{
+            command_type: commandtype(match parts.next() {
+                Some(t)=> t,
+                None => ""
+            }).unwrap_or_else(|_|{
                 return CommandType::Invalid;
             }),
-            query_content: query_content.to_string(),
+            query_content: match parts.next() {
+                Some(t) => t,
+                None => "",
+            }.to_string(),
         };
         commands_and_contents.push(ccentry);
     }
