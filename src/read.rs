@@ -94,6 +94,7 @@ fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> 
                 Some(vec) => vec,
                 None => continue,
             };
+            actionable_line.insert_str(0, " ");
             latest_command.query_content.push_str(actionable_line);
         }
     }
