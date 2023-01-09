@@ -1,31 +1,34 @@
+use core::panic;
 use std::env::Args;
 use std::fs;
 use std::io;
 use std::process;
 
 const EXPECTED_LENGTH_OF_ARGS:u8 = 2;
+const LIST_OF_COMMANDS:&'static [&str] = &["commit", "issue", "milestone"];
 
 #[derive(Debug)]
 enum CommandType {
     C0,
     C1,
     C2,
-    C3,
-    C4,
-    C5,
-    C6,
-    C7,
-    C8,
-    C9
+    // C3,
+    // C4,
+    // C5,
+    // C6,
+    // C7,
+    // C8,
+    // C9,
 }
 
-pub struct Config {
-    pub location: String
-}
 #[derive(Debug)]
 pub struct Command {
     command_type: CommandType,
     query_content: String
+}
+
+pub struct Config {
+    pub location: String
 }
 
 impl Config {
@@ -77,7 +80,10 @@ fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> 
                 None => {accepted = !accepted; break},
             };
             let ccentry: Command = Command {
-                command_type: CommandType::C0,
+                command_type: match commandtype(delimited.0) {
+                    Ok(ct) => ct,
+                    Err(e) => panic!("Something went wrong with the command type!: {}", e),
+                },
                 query_content: delimited.1.to_string(),
             };
             commands_and_contents.push(ccentry);
@@ -88,5 +94,20 @@ fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> 
     }
     else {
         Err("There was an error parsing the commands!")
+    }
+}
+
+fn commandtype(cmd_str: &str) -> Result<CommandType, &'static str> {
+    let command_term:String;
+    match LIST_OF_COMMANDS.binary_search(&cmd_str) {
+        Ok(cmd) => command_term = LIST_OF_COMMANDS[cmd].to_string(),
+        Err(_) => command_term = "".to_string(),
+    }
+    match command_term.as_str() {
+        "commit" => return Ok(CommandType::C0),
+        "issue" => return Ok(CommandType::C1),
+        "milestone" => return Ok(CommandType::C2),
+        _ => return Err("You have used an invalid command!"),
+
     }
 }

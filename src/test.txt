@@ -1,3 +1,4 @@
 TESTING123456!
-    ### @IAMCOMMENT: Do This thing
+    ### @issue Do This thing
+    ### @commit Hello World!
     ### Comment!
