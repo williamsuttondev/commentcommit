@@ -90,7 +90,10 @@ fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> 
             };
             commands_and_contents.push(ccentry);
         } else {
-            let latest_command = commands_and_contents.last_mut().unwrap();
+            let latest_command = match commands_and_contents.last_mut() {
+                Some(vec) => vec,
+                None => continue,
+            };
             latest_command.query_content.push_str(actionable_line);
         }
     }
