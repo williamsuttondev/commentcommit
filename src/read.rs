@@ -72,31 +72,27 @@ pub fn split_by_comment(content: String) {
 
 fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> {
     let mut commands_and_contents:Vec<Command> = Vec::new();
-    let mut command_counter:usize = 0;
     for actionable_line in command_arr.iter_mut() {
-        if !actionable_line.starts_with("@") {
-            let curr_vec = match commands_and_contents.get_mut(command_counter-1)  {
-                Some(vec) => vec,
-                None => continue,
+        if actionable_line.starts_with("@") {
+            actionable_line.remove(0);
+            let mut parts = actionable_line.splitn(2, ' ');
+            let ccentry: Command = Command {
+                command_type: commandtype(match parts.next() {
+                    Some(t)=> t,
+                    None => ""
+                }).unwrap_or_else(|_|{
+                    return CommandType::Invalid;
+                }),
+                query_content: match parts.next() {
+                    Some(t) => t,
+                    None => "",
+                }.to_string(),
             };
-            curr_vec.query_content += actionable_line;
+            commands_and_contents.push(ccentry);
+        } else {
+            let latest_command = commands_and_contents.last_mut().unwrap();
+            latest_command.query_content.push_str(actionable_line);
         }
-        actionable_line.remove(0);
-        let mut parts = actionable_line.splitn(2, ' ');
-        let ccentry: Command = Command {
-            command_type: commandtype(match parts.next() {
-                Some(t)=> t,
-                None => ""
-            }).unwrap_or_else(|_|{
-                return CommandType::Invalid;
-            }),
-            query_content: match parts.next() {
-                Some(t) => t,
-                None => "",
-            }.to_string(),
-        };
-        commands_and_contents.push(ccentry);
-        command_counter+=1;
     }
     Ok(commands_and_contents)
 }
