@@ -58,7 +58,7 @@ pub fn split_by_comment(content: String) {
         println!("The command interpreter failed due to: {}", e);
         process::exit(1);
     });
-    println!("{:?}", print_out(&x));
+    println!("{:?}", print_out(&x)); // TODO implement here
 }
 
 fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> {
@@ -68,12 +68,20 @@ fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> 
             continue;
         }
         actionable_line.remove(0);
-        let parts:Vec<&str> = actionable_line.splitn(2, ' ').collect();
+        let mut parts = actionable_line.splitn(2, ' ');
+        let cmd_type_arg = match parts.next() {
+            Some(t) => t,
+            None => "",
+        };
+        let query_content = match parts.next() {
+            Some(t) => t,
+            None => "",
+        };
         let ccentry: Command = Command {
-            command_type: commandtype(parts[0]).unwrap_or_else(|_|{
+            command_type: commandtype(cmd_type_arg).unwrap_or_else(|_|{
                 return CommandType::Invalid;
             }),
-            query_content: parts[1].to_string(),
+            query_content: query_content.to_string(),
         };
         commands_and_contents.push(ccentry);
     }
