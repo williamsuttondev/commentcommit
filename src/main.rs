@@ -2,15 +2,16 @@ mod read;
 
 use std::env;
 use read::Config;
+use std::process;
 
 fn main() {
-    let cfg = match Config::create(env::args()) {
-        Ok(configuration) => configuration,
-        Err(e) => panic!("{}", e),
-    };
-    let str_content = match read::get_contents(&cfg.location) {
-        Ok(str) => str,
-        Err(e) => panic!("{}", e),
-    };
+    let cfg = Config::create(env::args()).unwrap_or_else(|e| {
+        eprintln!("Error creating configuration: {}", e);
+        process::exit(1);
+    });
+    let str_content = read::get_contents(&cfg.location).unwrap_or_else(|e| {
+        eprintln!("Error reading file: {}", e);
+        process::exit(1);
+    });
     read::split_by_comment(str_content);
 }

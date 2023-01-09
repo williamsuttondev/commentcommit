@@ -70,8 +70,7 @@ fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> 
         actionable_line.remove(0);
         let parts:Vec<&str> = actionable_line.splitn(2, ' ').collect();
         let ccentry: Command = Command {
-            command_type: commandtype(parts[0]).unwrap_or_else(|e|{
-                println!("{}", e);
+            command_type: commandtype(parts[0]).unwrap_or_else(|_|{
                 return CommandType::Invalid;
             }),
             query_content: parts[1].to_string(),
