@@ -1,4 +1,3 @@
-use core::panic;
 use std::env::Args;
 use std::fs;
 use std::io;
@@ -12,6 +11,7 @@ enum CommandType {
     C0,
     C1,
     C2,
+    Invalid
     // C3,
     // C4,
     // C5,
@@ -70,10 +70,10 @@ fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> 
         actionable_line.remove(0);
         let parts:Vec<&str> = actionable_line.splitn(2, ' ').collect();
         let ccentry: Command = Command {
-            command_type: match commandtype(parts[0]) {
-                Ok(ct) => ct,
-                Err(e) => panic!("Something went wrong with the command type!: {}", e),
-            },
+            command_type: commandtype(parts[0]).unwrap_or_else(|e|{
+                println!("{}", e);
+                return CommandType::Invalid;
+            }),
             query_content: parts[1].to_string(),
         };
         commands_and_contents.push(ccentry);
