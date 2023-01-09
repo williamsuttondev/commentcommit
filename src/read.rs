@@ -50,10 +50,19 @@ pub fn get_contents(path: &String) -> io::Result<String> {
     fs::read_to_string(path)
 }
 pub fn split_by_comment(content: String) {
-    let mut cleansed: Vec<String> = Vec::new();
-    for indv in content.split("###") {
-        cleansed.push(indv.trim_start_matches("###").trim().to_string());
+    let mut cleansed:Vec<String> = Vec::new();
+    for indv in content.lines() {
+        let handle = indv.trim();
+        if handle.starts_with("###") {
+            let mut linespl = handle.split("###");
+            linespl.next();
+            cleansed.push(match linespl.next() {
+                Some(t) => t,
+                None => "",
+            }.trim().to_string());
+        }
     }
+    println!("{:?}", cleansed);
     let x = commands(cleansed).unwrap_or_else(|e| {
         println!("The command interpreter failed due to: {}", e);
         process::exit(1);
@@ -63,9 +72,14 @@ pub fn split_by_comment(content: String) {
 
 fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> {
     let mut commands_and_contents:Vec<Command> = Vec::new();
+    let mut command_counter:usize = 0;
     for actionable_line in command_arr.iter_mut() {
         if !actionable_line.starts_with("@") {
-            continue;
+            let curr_vec = match commands_and_contents.get_mut(command_counter-1)  {
+                Some(vec) => vec,
+                None => continue,
+            };
+            curr_vec.query_content += actionable_line;
         }
         actionable_line.remove(0);
         let mut parts = actionable_line.splitn(2, ' ');
@@ -82,6 +96,7 @@ fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> 
             }.to_string(),
         };
         commands_and_contents.push(ccentry);
+        command_counter+=1;
     }
     Ok(commands_and_contents)
 }
