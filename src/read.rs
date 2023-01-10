@@ -1,3 +1,7 @@
+// TODO REVIEW THIS CLASS MAKE MORE EFFICIENT
+// ADD MORE FUNC
+// MOVE TO DOCUMENTATION IN SEPERATE BRANCH
+
 use std::env::Args;
 use std::fs;
 use std::io;
