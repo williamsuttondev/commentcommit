@@ -62,7 +62,6 @@ pub fn split_by_comment(content: String) {
             }.trim().to_string());
         }
     }
-    println!("{:?}", cleansed);
     let x = commands(cleansed).unwrap_or_else(|e| {
         println!("The command interpreter failed due to: {}", e);
         process::exit(1);
