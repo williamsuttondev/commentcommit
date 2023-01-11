@@ -4,7 +4,6 @@ mod command;
 use std::env;
 use read::Config;
 use std::process;
-use command::test;
 
 fn main() {
     // let cfg = Config::create(env::args()).unwrap_or_else(|e| {

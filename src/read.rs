@@ -7,7 +7,7 @@ const EXPECTED_LENGTH_OF_ARGS:u8 = 2;
 const LIST_OF_COMMANDS:&'static [&str] = &["commit", "issue", "milestone"];
 
 #[derive(Debug)]
-enum CommandType {
+pub enum CommandType {
     C0,
     C1,
     C2,
