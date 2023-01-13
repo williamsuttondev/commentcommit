@@ -10,7 +10,8 @@ use crate::read::CommandType;
 pub fn execute_git_comm() /* -> Option<bool> */ {
     // imp unwrap_or_else for error handling
     // don't use multiple vars for our case but its fine...
-    let result_add = Command::new("git").args(["add", "test-track/updateme.txt"]).output()
+    // args takes an array of str slices or literals
+    Command::new("git").args(["add", "test-track/updateme.txt"]).status()
                                                     .expect("There was an error running git add!");
     let result_commit = Command::new("git").args(["commit", "-m Disregard - Testing commit functionality of software"]).output()
                                                     .expect("There was an error running git commit!");
