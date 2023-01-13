@@ -23,7 +23,7 @@ pub enum CommandType {
 }
 
 #[derive(Debug)]
-pub struct Command {
+pub struct CardCommand {
     command_type: CommandType,
     query_content: String
 }
@@ -74,13 +74,13 @@ pub fn split_by_comment(content: String, filename: &String) -> std::io::Result<(
     Ok(())
 }
 
-fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> {
-    let mut commands_and_contents:Vec<Command> = Vec::new();
+fn commands(mut command_arr: Vec<String>) -> Result<Vec<CardCommand>, &'static str> {
+    let mut commands_and_contents:Vec<CardCommand> = Vec::new();
     for actionable_line in command_arr.iter_mut() {
         if actionable_line.starts_with("@") {
             actionable_line.remove(0);
             let mut parts = actionable_line.splitn(2, ' ');
-            let ccentry: Command = Command {
+            let ccentry: CardCommand = CardCommand {
                 command_type: commandtype(match parts.next() {
                     Some(t)=> t,
                     None => ""
@@ -123,9 +123,9 @@ fn commandtype(cmd_str: &str) -> Result<CommandType, &'static str> {
 
 // temp func
 
-fn print_out(cmds: &Vec<Command>) {
+fn print_out(cmds: &Vec<CardCommand>) {
     for i in cmds.iter() {
-        println!("Command action: {:?}", i.command_type);
+        println!("CardCommand action: {:?}", i.command_type);
         println!("Query/Content {}", i.query_content);
     }
 }
