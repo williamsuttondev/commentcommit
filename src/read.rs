@@ -1,17 +1,14 @@
-// TODO REVIEW THIS CLASS MAKE MORE EFFICIENT
-// ADD MORE FUNC
-// MOVE TO DOCUMENTATION IN SEPERATE BRANCH
-
 use std::env::Args;
 use std::fs;
 use std::io;
+use std::io::Write;
 use std::process;
 
 const EXPECTED_LENGTH_OF_ARGS:u8 = 2;
 const LIST_OF_COMMANDS:&'static [&str] = &["commit", "issue", "milestone"];
 
 #[derive(Debug)]
-enum CommandType {
+pub enum CommandType {
     C0,
     C1,
     C2,
@@ -53,8 +50,9 @@ impl Config {
 pub fn get_contents(path: &String) -> io::Result<String> {
     fs::read_to_string(path)
 }
-pub fn split_by_comment(content: String) {
+pub fn split_by_comment(content: String, filename: &String) -> std::io::Result<()> {
     let mut cleansed:Vec<String> = Vec::new();
+    let mut remove_card = fs::OpenOptions::new().write(true).truncate(true).open(filename)?;
     for indv in content.lines() {
         let handle = indv.trim();
         if handle.starts_with("###") {
@@ -64,6 +62,8 @@ pub fn split_by_comment(content: String) {
                 Some(t) => t,
                 None => "",
             }.trim().to_string());
+        } else {
+            writeln!(remove_card, "{}", indv)?;
         }
     }
     let x = commands(cleansed).unwrap_or_else(|e| {
@@ -71,6 +71,7 @@ pub fn split_by_comment(content: String) {
         process::exit(1);
     });
     println!("{:?}", print_out(&x)); // TODO implement here
+    Ok(())
 }
 
 fn commands(mut command_arr: Vec<String>) -> Result<Vec<Command>, &'static str> {
@@ -123,8 +124,7 @@ fn commandtype(cmd_str: &str) -> Result<CommandType, &'static str> {
 // temp func
 
 fn print_out(cmds: &Vec<Command>) {
-    let iterator = cmds.iter();
-    for i in iterator {
+    for i in cmds.iter() {
         println!("Command action: {:?}", i.command_type);
         println!("Query/Content {}", i.query_content);
     }
