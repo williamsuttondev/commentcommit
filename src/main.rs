@@ -15,5 +15,5 @@ fn main() {
     //     process::exit(1);
     // });
     // read::split_by_comment(str_content);
-    command::test();
+    command::execute_git_comm();
 }

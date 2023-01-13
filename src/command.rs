@@ -5,11 +5,17 @@ use std::process::Command;
 
 use crate::read::CommandType;
 
-
-pub fn test() {
-    let test = Command::new("echo").arg("test").spawn().expect("There was an error running the command");
-    println!("{:?}", test.stdout);
-
+// Putting multiple in here temporarily, will be more later down the line
+// Implement the return option type for later error handling
+pub fn execute_git_comm() /* -> Option<bool> */ {
+    // imp unwrap_or_else for error handling
+    // don't use multiple vars for our case but its fine...
+    let result_add = Command::new("git").args(["add", "test-track/updateme.txt"]).output()
+                                                    .expect("There was an error running git add!");
+    let result_commit = Command::new("git").args(["commit", "-m Disregard - Testing commit functionality of software"]).output()
+                                                    .expect("There was an error running git commit!");
+    let result_push = Command::new("git").arg("push").output()
+                                                    .expect("There was an error running git push!");
 }
 
 fn construct_arg_comm(args : &Vec<CommandType>) -> Vec<&str> {
