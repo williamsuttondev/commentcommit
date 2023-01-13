@@ -3,28 +3,14 @@ use std::fs;
 use std::io;
 use std::io::Write;
 use std::process;
+use std::sync::Arc;
 
 const EXPECTED_LENGTH_OF_ARGS:u8 = 2;
 const LIST_OF_COMMANDS:&'static [&str] = &["commit", "issue", "milestone"];
 
 #[derive(Debug)]
-pub enum CommandType {
-    C0,
-    C1,
-    C2,
-    Invalid
-    // C3,
-    // C4,
-    // C5,
-    // C6,
-    // C7,
-    // C8,
-    // C9,
-}
-
-#[derive(Debug)]
 pub struct CardCommand {
-    command_type: CommandType,
+    command_type: String,
     query_content: String
 }
 
@@ -81,12 +67,10 @@ fn commands(mut command_arr: Vec<String>) -> Result<Vec<CardCommand>, &'static s
             actionable_line.remove(0);
             let mut parts = actionable_line.splitn(2, ' ');
             let ccentry: CardCommand = CardCommand {
-                command_type: commandtype(match parts.next() {
-                    Some(t)=> t,
-                    None => ""
-                }).unwrap_or_else(|_|{
-                    return CommandType::Invalid;
-                }),
+                command_type: match parts.next() {
+                    Some(t) => t.to_string(),
+                    None => "invalid".to_string(),
+                },
                 query_content: match parts.next() {
                     Some(t) => t,
                     None => "",
@@ -103,22 +87,6 @@ fn commands(mut command_arr: Vec<String>) -> Result<Vec<CardCommand>, &'static s
         }
     }
     Ok(commands_and_contents)
-}
-
-fn commandtype(cmd_str: &str) -> Result<CommandType, &'static str> {
-    let command_term = match LIST_OF_COMMANDS.binary_search(&cmd_str) {
-        Ok(cmd) => LIST_OF_COMMANDS[cmd].to_string(),
-        Err(_) => "".to_string(),
-    };
-    if command_term=="commit" {
-        Ok(CommandType::C0)
-    } else if command_term=="issue" {
-        Ok(CommandType::C1)
-    } else if command_term == "milestone" {
-        Ok(CommandType::C2)
-    } else {
-        Err("You have used an invalid command!")
-    }
 }
 
 // temp func
