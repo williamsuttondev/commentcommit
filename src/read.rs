@@ -17,6 +17,7 @@ pub struct CardCommand {
     command_type: String,
     query_content: String
 }
+
 /// This config struct will be a simple way (currently) to store information about our read configuration,
 /// this currently only contains the locatation + name of our file.
 pub struct Config {

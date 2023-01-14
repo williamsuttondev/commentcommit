@@ -1,6 +1,26 @@
+// TODO Construct git commands dynamically based upon git cards
+// Implement task runners via threads to construct based upon x command in the git card
+
 use std::process::Command;
 
-pub fn test() {
-    let test = Command::new("echo").arg("test").spawn().expect("There was an error running the command");
-    println!("{:?}", test.stdout);
+// Putting multiple in here temporarily, will be more later down the line
+// Implement the return option type for later error handling
+pub fn execute_git_comm() /* -> Option<bool> */ {
+    // imp unwrap_or_else for error handling
+    // don't use multiple vars for our case but its fine...
+    // args takes an array of str slices or literals
+    Command::new("git").args(["add", "test-track/updateme.txt"]).status()
+                                                    .expect("There was an error running git add!");
+    let result_commit = Command::new("git").args(["commit", "-m Disregard - Testing commit functionality of software"]).output()
+                                                    .expect("There was an error running git commit!");
+    let result_push = Command::new("git").arg("push").output()
+                                                    .expect("There was an error running git push!");
+}
+
+fn construct_arg_comm(args : &Vec<String>) -> Vec<&str> {
+    let mut git_commands: Vec<&str> = Vec::new();
+    for arg in args {
+        git_commands.push(arg);
+    }
+    git_commands
 }

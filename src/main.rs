@@ -4,7 +4,6 @@ mod command;
 use std::env;
 use read::Config;
 use std::process;
-use command::test;
 
 fn main() {
     // let cfg = Config::create(env::args()).unwrap_or_else(|e| {
@@ -16,5 +15,5 @@ fn main() {
     //     process::exit(1);
     // });
     // read::split_by_comment(str_content);
-    command::test();
+    command::execute_git_comm();
 }
