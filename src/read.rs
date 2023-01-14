@@ -1,7 +1,6 @@
 use std::env::Args;
 use std::fs;
 use std::io;
-use std::io::Write;
 use std::process;
 
 /// This will be the expected amount of arguments of the cl interpreter,
@@ -60,70 +59,58 @@ pub fn get_contents(path: &String) -> io::Result<String> {
 /// `content` - The String containing all of the contents of a file.
 /// `filename` - The perpetuated for use to identify which file the program needs to open to modify.
 pub fn split_by_comment(content: String, filename: &String) -> std::io::Result<()> {
-    let mut cleansed:Vec<String> = Vec::new();
-    let mut remove_card = fs::OpenOptions::new().write(true).truncate(true).open(filename)?;
-    for indv in content.lines() {
-        let handle = indv.trim();
-        if handle.starts_with("###") {
-            let mut linespl = handle.split("###");
-            linespl.next();
-            cleansed.push(match linespl.next() {
-                Some(t) => t,
-                None => "",
-            }.trim().to_string());
-        } else {
-            writeln!(remove_card, "{}", indv)?;
-        }
-    }
-    let x = commands_conversion(cleansed).unwrap_or_else(|e| {
-        println!("The command interpreter failed due to: {}", e);
+    let cleansed = content.lines()
+        .filter(|line| line.trim().starts_with("###"))
+        .map(|line| line.split("###").nth(1).unwrap_or("").trim().to_string())
+        .collect::<Vec<String>>();
+    // let _ = std::fs::write(filename, content.lines()
+    //     .filter(|line| !line.trim().starts_with("###"))
+    //     .collect::<Vec<&str>>()
+    //     .join("\n"));
+    let x = commands_conversion(cleansed).unwrap_or_else(|_| {
+        println!("The command interpreter failed");
         process::exit(1);
     });
-    println!("{:?}", print_out(&x)); // TODO implement here
+    println!("{:?}", print_out(&x));
     Ok(())
 }
-    /// This function is responsible for taking the String vector containing different actions and comments
-    /// and splitting them up into their organised contents for use in the git automation.
-    /// It will take lines beginning with @, remove the at and take the word next to it as a command arg for git.
-    /// If the line doesn't begin with an @ and there is no existing card commands inside vector, 
-    /// the line will be discarded (for now).
-    /// If the line doesn't begin with an @ and there is existing command in the vector, then the contents will be added
-    /// to the most recent vector. (How most docs work.)
-    /// # Arguments
-    /// `command_arr` - The array containing each line from the split_by_comment function.
-fn commands_conversion(mut command_arr: Vec<String>) -> Result<Vec<CardCommand>, &'static str> {
-    let mut commands_and_contents:Vec<CardCommand> = Vec::new();
-    for actionable_line in command_arr.iter_mut() {
-        if actionable_line.starts_with("@") {
-            actionable_line.remove(0);
-            let mut parts = actionable_line.splitn(2, ' ');
-            let ccentry: CardCommand = CardCommand {
-                command_type: match parts.next() {
-                    Some(t) => t.to_string(),
-                    None => "invalid".to_string(),
-                },
-                query_content: match parts.next() {
-                    Some(t) => t,
-                    None => "",
-                }.to_string(),
-            };
-            commands_and_contents.push(ccentry);
-        } else {
-            let latest_command = match commands_and_contents.last_mut() {
-                Some(vec) => vec,
-                None => continue,
-            };
-            actionable_line.insert_str(0, " ");
-            latest_command.query_content.push_str(actionable_line);
-        }
-    }
+/// This function is responsible for taking the String vector containing different actions and comments
+/// and splitting them up into their organised contents for use in the git automation.
+/// It will take lines beginning with @, remove the at and take the word next to it as a command arg for git.
+/// If the line doesn't begin with an @ and there is no existing card commands inside vector, 
+/// the line will be discarded (for now).
+/// If the line doesn't begin with an @ and there is existing command in the vector, then the contents will be added
+/// to the most recent vector. (How most docs work.)
+/// # Arguments
+/// `command_arr` - The array containing each line from the split_by_comment function.
+fn commands_conversion(command_arr: Vec<String>) -> Result<Vec<CardCommand>, &'static str> {
+    let commands_and_contents = command_arr
+        .into_iter()
+        .fold(
+            Vec::new(),
+            |mut commands, line| {
+                if line.starts_with("@") {
+                    let parts: Vec<&str> = line.splitn(2, ' ').collect();
+                    let command_type = parts[0].trim_start_matches("@").to_string();
+                    let query_content = match parts.get(1) {
+                        Some(t) => t.to_string(),
+                        None => "".to_string(),
+                    };
+                    commands.push(CardCommand { command_type, query_content });
+                } else {
+                    if let Some(latest_command) = commands.last_mut() {
+                        latest_command.query_content += &(" ".to_string() + &line);
+                    }
+                }
+                commands
+            },
+        );
     Ok(commands_and_contents)
 }
-
 /// Temp test func.
 fn print_out(cmds: &Vec<CardCommand>) {
     for i in cmds.iter() {
-        println!("CardCommand action: {:?}", i.command_type);
+        println!("CardCommand action: {}", i.command_type);
         println!("Query/Content {}", i.query_content);
     }
 }
