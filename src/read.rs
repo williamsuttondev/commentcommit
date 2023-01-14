@@ -6,9 +6,6 @@ use std::process;
 /// This will be the expected amount of arguments of the cl interpreter,
 /// it will essentially know when to exit the iterator/loop when commands are being interpreted.
 const EXPECTED_LENGTH_OF_ARGS:u8 = 2;
-/// This is our list of approved commands, at the minute, only has commit issue and milestone and will
-/// be used as a way of checking the sanity for what the user has input.
-const LIST_OF_COMMANDS:&'static [&str] = &["commit", "issue", "milestone"];
 
 #[derive(Debug)]
 /// This is our custom struct/type that contains two strings, currently the command_type and query_content
@@ -64,10 +61,10 @@ pub fn split_by_comment(content: String, filename: &String) -> std::io::Result<(
         .filter(|line| line.trim().starts_with("###"))
         .map(|line| line.split("###").nth(1).unwrap_or("").trim().to_string())
         .collect::<Vec<String>>();
-    // let _ = std::fs::write(filename, content.lines()
-    //     .filter(|line| !line.trim().starts_with("###"))
-    //     .collect::<Vec<&str>>()
-    //     .join("\n"));
+    let _ = std::fs::write(filename, content.lines()
+        .filter(|line| !line.trim().starts_with("###"))
+        .collect::<Vec<&str>>()
+        .join("\n"));
     let x = commands_conversion(cleansed).unwrap_or_else(|_| {
         println!("The command interpreter failed");
         process::exit(1);

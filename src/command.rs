@@ -3,6 +3,11 @@
 
 use std::process::Command;
 
+/// This is our list of approved commands, at the minute, only has commit issue and milestone and will
+/// be used as a way of checking the sanity for what the user has input.
+const LIST_OF_COMMANDS:&'static [&str] = &["commit", "issue", "milestone"];
+
+
 // Putting multiple in here temporarily, will be more later down the line
 // Implement the return option type for later error handling
 pub fn execute_git_comm() /* -> Option<bool> */ {
