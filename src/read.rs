@@ -5,7 +5,7 @@ use std::process;
 
 /// This will be the expected amount of arguments of the cl interpreter,
 /// it will essentially know when to exit the iterator/loop when commands are being interpreted.
-const EXPECTED_LENGTH_OF_ARGS:u8 = 2;
+const EXPECTED_LENGTH_OF_ARGS:usize = 2;
 
 #[derive(Debug)]
 /// This is our custom struct/type that contains two strings, currently the command_type and query_content
@@ -28,17 +28,11 @@ impl Config {
     /// `args` - The fs::Args type that will be everything the user puts into the command line when 
     /// running the application.
     pub fn create(args: Args) -> Result<Config, &'static str> {
-        let mut parsed: Vec<String> = Vec::new();
-        let expected_length = EXPECTED_LENGTH_OF_ARGS;
-        let error_msg = "There are too few arguments in the command line, please try again.";
-        for arg in args {
-            parsed.push(arg);
-            if parsed.len() == expected_length as usize {
-                let location = &parsed[1];
-                return Ok(Config { location: location.to_string() });
-            }
+        let parsed: Vec<String> = args.take(EXPECTED_LENGTH_OF_ARGS).collect();
+        if parsed.len() < EXPECTED_LENGTH_OF_ARGS as usize {
+            return Err("There are too few arguments in the command line, please try again.");
         }
-        Err(error_msg)
+        Ok(Config { location: parsed[1].to_string() })
     }
 }
 /// Simply opens the file and reads its contents to a string.
