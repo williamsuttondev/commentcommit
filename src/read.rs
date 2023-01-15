@@ -11,8 +11,8 @@ const EXPECTED_LENGTH_OF_ARGS:usize = 2;
 /// This is our custom struct/type that contains two strings, currently the command_type and query_content
 /// we can use this struct for extensibility purposes if there was ever more information that needed to be known.
 pub struct CardCommand {
-    command_type: String,
-    query_content: String
+    pub command_type: String,
+    pub query_content: String
 }
 
 /// This config struct will be a simple way (currently) to store information about our read configuration,
@@ -50,7 +50,7 @@ pub fn get_contents(path: &String) -> io::Result<String> {
 /// # Arguments
 /// `content` - The String containing all of the contents of a file.
 /// `filename` - The perpetuated for use to identify which file the program needs to open to modify.
-pub fn split_by_comment(content: String, filename: &String) -> std::io::Result<()> {
+pub fn split_by_comment(content: String, filename: &String) -> std::io::Result<Vec<CardCommand>> {
     let cleansed = content.lines()
         .filter(|line| line.trim().starts_with("###"))
         .map(|line| line.split("###").nth(1).unwrap_or("").trim().to_string())
@@ -63,8 +63,7 @@ pub fn split_by_comment(content: String, filename: &String) -> std::io::Result<(
         println!("The command interpreter failed");
         process::exit(1);
     });
-    println!("{:?}", print_out(&x));
-    Ok(())
+    Ok(x)
 }
 /// This function is responsible for taking the String vector containing different actions and comments
 /// and splitting them up into their organised contents for use in the git automation.
@@ -98,11 +97,4 @@ fn commands_conversion(command_arr: Vec<String>) -> Result<Vec<CardCommand>, &'s
             },
         );
     Ok(commands_and_contents)
-}
-/// Temp test func.
-fn print_out(cmds: &Vec<CardCommand>) {
-    for i in cmds.iter() {
-        println!("CardCommand action: {}", i.command_type);
-        println!("Query/Content {}", i.query_content);
-    }
 }

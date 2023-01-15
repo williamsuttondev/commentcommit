@@ -14,6 +14,9 @@ fn main() {
         eprintln!("Error reading file: {}", e);
         process::exit(1);
     });
-    read::split_by_comment(str_content, &cfg.location);
-    // command::execute_git_comm();
+    let commands = read::split_by_comment(str_content, &cfg.location).unwrap();
+    let _ = match command::layout_and_execute_commands(commands, cfg.location.as_str()){
+        Ok(_) => process::exit(0),
+        Err(e) => {println!("processfailedwitherror: {}", e); process::exit(1)}
+    };
 }

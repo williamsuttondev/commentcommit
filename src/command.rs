@@ -3,29 +3,32 @@
 
 use std::process::Command;
 
-/// This is our list of approved commands, at the minute, only has commit issue and milestone and will
-/// be used as a way of checking the sanity for what the user has input.
-const LIST_OF_COMMANDS:&'static [&str] = &["commit", "issue", "milestone"];
+use crate::read;
 
-
-// Putting multiple in here temporarily, will be more later down the line
-// Implement the return option type for later error handling
-pub fn execute_git_comm() /* -> Option<bool> */ {
-    // imp unwrap_or_else for error handling
-    // don't use multiple vars for our case but its fine...
-    // args takes an array of str slices or literals
-    Command::new("git").args(["add", "test-track/updateme.txt"]).status()
-                                                    .expect("There was an error running git add!");
-    let result_commit = Command::new("git").args(["commit", "-m Disregard - Testing commit functionality of software"]).output()
-                                                    .expect("There was an error running git commit!");
-    let result_push = Command::new("git").arg("push").output()
-                                                    .expect("There was an error running git push!");
+pub fn layout_and_execute_commands(commands : Vec<read::CardCommand>, req_file : &str) -> Result<&str, &str> {
+    // Multiple implementation for different git command types will be here
+    let _ = Command::new("git").args(["add", req_file]).status();
+    let commit_command:Vec<read::CardCommand> = commands.into_iter().filter(|x| x.command_type == "commit").collect();
+    let commit_command_len = commit_command.len();
+    if commit_command_len == 1 {
+        execute_git_comm(commit_command.first().unwrap());
+    } else {
+        return Err("You have entered too many or no commit messages");
+    }
+    match Command::new("git").arg("push").status() {
+        Ok(status) => {
+            if status.success() {
+                return Ok("Git commands successfully ran!");
+            } else {
+                return Err("There was an error running git push command!");
+            }
+        },
+        Err(_) => return Err("There wan error constructing the command!"),
+    }
 }
 
-fn construct_arg_comm(args : &Vec<String>) -> Vec<&str> {
-    let mut git_commands: Vec<&str> = Vec::new();
-    for arg in args {
-        git_commands.push(arg);
+fn execute_git_comm(curr_command : &read::CardCommand) {
+    if curr_command.command_type == "commit" {
+        let _ = Command::new("git").args(["commit", format!("{}{}", "-m", curr_command.command_type.as_str()).as_str()]).status();
     }
-    git_commands
 }
